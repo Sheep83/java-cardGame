@@ -16,9 +16,10 @@ public class Game {
 //	  // public Display display;
 //
 //	  //GAME CONSTRUCTOR
-//	  public Game(){
-//	    this.players = new ArrayList<Player>();
-//	  }
+	  public Game(){
+	    this.players = new ArrayList<Player>();
+	    this.deck = new Deck();
+	  }
 //
 //	  public Player createPlayer(String name, Hand hand){
 //	    Player player = new Player (name, hand);
