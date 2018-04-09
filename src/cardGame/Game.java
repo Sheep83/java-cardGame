@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.Random;
 
 public class Game {
-//	  public static Deck deck;
-//	  public static ArrayList<Player> players;
+	  public static Deck deck;
+	  public static ArrayList<Player> players;
 ////	  public static Viewer viewer;
 //	  public static ArrayList<String> initNames = new ArrayList<String>();
 //	  public Player player, player1, player2;
