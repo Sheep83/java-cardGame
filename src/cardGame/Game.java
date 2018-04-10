@@ -1,12 +1,27 @@
 package cardGame;
 
+import java.awt.Canvas;
+import java.awt.Color;
+import java.awt.Graphics;
+//import java.awt.Window;
+import java.awt.image.BufferStrategy;
 import java.util.ArrayList;
 import java.util.Random;
 
-public class Game {
-	  public static Deck deck;
-	  public static ArrayList<Player> players;
-////	  public static Viewer viewer;
+public class Game extends Canvas implements Runnable{
+	static final long serialVersionUID = 40685470597404756L;
+	public Deck deck;
+	public ArrayList<Player> players;
+	private Thread thread;
+	private boolean running = false;
+	public Handler handler;
+	public static final int WIDTH = 1280, HEIGHT = 1024;
+	public static enum STATE {
+		Menu,
+		Game
+	};
+	public static STATE gameState;
+	private Menu menu;
 //	  public static ArrayList<String> initNames = new ArrayList<String>();
 //	  public Player player, player1, player2;
 //	  public Random random;
@@ -17,9 +32,129 @@ public class Game {
 //
 //	  //GAME CONSTRUCTOR
 	  public Game(){
+		new Window(WIDTH, HEIGHT, "cardGame", this);
 	    this.players = new ArrayList<Player>();
 	    this.deck = new Deck();
+	    this.handler = new Handler();
+	    gameState = STATE.Menu;
+	    menu = new Menu(this, handler);
 	  }
+	  
+	  public synchronized void start() {
+			
+			thread = new Thread(this);
+			thread.start();
+			running = true;
+		}
+		
+		public synchronized void stop() {
+		
+			try {
+				thread.join();
+				running = false;
+			}catch(Exception e){
+				e.printStackTrace();
+			}
+		}
+
+		public void run()
+	    {
+			this.requestFocus();
+	        long lastTime = System.nanoTime();
+	        double amountOfTicks = 60.0;
+	        double ns = 1000000000 / amountOfTicks;
+	        double delta = 0;
+	        int updates = 0;
+	        int frames = 0;
+	        long timer = System.currentTimeMillis();
+	        while(running){
+	        	long now = System.nanoTime();
+	            delta += (now - lastTime) / ns;
+	            lastTime = now;
+	            while(delta >=1){
+	            	tick();
+	            	updates ++;
+	                delta--;
+	                }
+	            
+	            if(running)
+	            	render();
+	                frames++;
+	                            
+	                if(System.currentTimeMillis() - timer > 1000){
+	                	timer += 1000;
+	                	System.out.println("FPS: "+ frames + "   Ticks: " + updates);
+	                	updates = 0;
+	                	frames = 0;
+	                 }
+	        }
+	        stop();	
+		}
+		
+		private void tick() {
+			
+			if(gameState == STATE.Menu) {
+				menu.tick();
+			}
+//			else if(gameState == STATE.Game) {
+////				soundPlayer.stopSound();
+////				soundPlayer.currentClip = null;
+////				gameOverCheck();
+//				if(Game.turn == TURN.Player) {
+//					Player player = (Player)handler.getPlayer();
+////					Game.camera.offsetX = (player.getX() + Game.WIDTH/2)*-1;
+////					Game.camera.offsetY = (player.getY() + Game.HEIGHT/2)*-1;
+////					System.out.println("offsetx: " + Game.camera.offsetX);
+////					System.out.println("offsety: " + Game.camera.offsetY);
+//					hud.tick();	
+//					handler.tick();	
+//				}else if(Game.turn == TURN.Enemy) {
+//					Enemy enemy = (Enemy)handler.getEnemy();
+////					Game.camera.setOffsetX(enemy.getX() + Game.WIDTH/2);
+////					Game.camera.setOffsetY(enemy.getY() + Game.HEIGHT/2);
+//					hud.tick();	
+//					handler.tick();
+//				}
+////				hud.tick();	
+////				handler.tick();
+////				Player player = (Player)handler.getPlayer();
+////				if(targetTile != null) {
+//////					for(int i = 0; i < handler.tiles.size(); i++) {
+//////						GameTile tile = (GameTile)handler.tiles.get(i);
+////////						tile.setPath(false);
+//////					}
+//////					path = finder.findPath(player, player.getMapX(), player.getMapY(), targetTile.getMapX(), targetTile.getMapY());
+////				}
+////				path = finder.findPath(player, player.getMapX(), player.getMapY(), 16, 3);
+//			}
+		}
+		
+		private void render() {
+			BufferStrategy bs = this.getBufferStrategy();
+			if (bs == null) {
+				this.createBufferStrategy(3);
+				return;
+			}
+			Graphics g = bs.getDrawGraphics();
+			
+			g.setColor(Color.black);
+			g.fillRect(0, 0, WIDTH, HEIGHT);
+//			if(gameState == STATE.Game) {
+//				g.drawImage(background, 0, 0, this);
+//				handler.render(g);
+//				hud.render(g);	
+//			}else 
+			if (gameState == STATE.Menu) {
+				menu.render(g);
+			}
+			
+			g.dispose();
+			bs.show();
+		}
+		
+		public static void main(String[] args) {
+			new Game();
+		}
 //
 //	  public Player createPlayer(String name, Hand hand){
 //	    Player player = new Player (name, hand);

@@ -1,5 +1,7 @@
 package cardGame;
 
+import java.awt.Graphics;
+
 public class Player {
 
 	  private String name;
@@ -69,5 +71,15 @@ public class Player {
 	      }
 	      this.checkIfOut();
 	    }
+
+	public void tick() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void render(Graphics g) {
+		// TODO Auto-generated method stub
+		
+	}
 	  }
 
