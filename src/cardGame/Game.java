@@ -5,6 +5,7 @@ import java.awt.Color;
 import java.awt.Graphics;
 //import java.awt.Window;
 import java.awt.image.BufferStrategy;
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -18,10 +19,14 @@ public class Game extends Canvas implements Runnable{
 	public static final int WIDTH = 1280, HEIGHT = 1024;
 	public static enum STATE {
 		Menu,
-		Game
+		Game, 
+		Setup
 	};
 	public static STATE gameState;
 	private Menu menu;
+	private SetupMenu setupMenu;
+	private HUD hud;
+	private BufferedImage background = null;
 //	  public static ArrayList<String> initNames = new ArrayList<String>();
 //	  public Player player, player1, player2;
 //	  public Random random;
@@ -33,11 +38,17 @@ public class Game extends Canvas implements Runnable{
 //	  //GAME CONSTRUCTOR
 	  public Game(){
 		new Window(WIDTH, HEIGHT, "cardGame", this);
-	    this.players = new ArrayList<Player>();
+		MouseControl mouseInput = new MouseControl(handler);
+		this.addMouseListener(mouseInput);
+		this.addMouseMotionListener(mouseInput);
+//	    this.players = new ArrayList<Player>();
 	    this.deck = new Deck();
 	    this.handler = new Handler();
+	    handler.addDeck(deck);
+	    this.hud = new HUD(handler);
 	    gameState = STATE.Menu;
 	    menu = new Menu(this, handler);
+	    setupMenu = new SetupMenu(this, handler);
 	  }
 	  
 	  public synchronized void start() {
@@ -96,7 +107,15 @@ public class Game extends Canvas implements Runnable{
 			if(gameState == STATE.Menu) {
 				menu.tick();
 			}
-//			else if(gameState == STATE.Game) {
+			else if(gameState == STATE.Game) {
+				handler.tick();
+				hud.tick();
+				
+			}else if(gameState == STATE.Setup) {
+				setupMenu.tick();
+//				hud.tick();
+				
+			}
 ////				soundPlayer.stopSound();
 ////				soundPlayer.currentClip = null;
 ////				gameOverCheck();
@@ -139,17 +158,22 @@ public class Game extends Canvas implements Runnable{
 			
 			g.setColor(Color.black);
 			g.fillRect(0, 0, WIDTH, HEIGHT);
-//			if(gameState == STATE.Game) {
-//				g.drawImage(background, 0, 0, this);
-//				handler.render(g);
-//				hud.render(g);	
-//			}else 
-			if (gameState == STATE.Menu) {
+			if(gameState == STATE.Game) {
+				g.drawImage(background, 0, 0, this);
+				handler.render(g);
+				hud.render(g);	
+			}else if (gameState == STATE.Menu) {
 				menu.render(g);
+			}else if (gameState == STATE.Setup) {
+				setupMenu.render(g);
 			}
 			
 			g.dispose();
 			bs.show();
+		}
+		
+		public static void setState(STATE state) {
+			gameState = state;
 		}
 		
 		public static void main(String[] args) {

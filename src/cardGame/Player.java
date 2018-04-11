@@ -1,15 +1,18 @@
 package cardGame;
 
 import java.awt.Graphics;
+import java.awt.Rectangle;
 
-public class Player {
+public class Player extends GameObject{
 
 	  private String name;
 //	  private int score;
 	  public Hand hand;
-	  public int index;
+	  public int index; 
+	  public boolean turn;
 
-	  public Player(String name, Hand hand){
+	  public Player(String name, Hand hand, ID id){
+		super(id);
 	    this.name = name;
 //	    this.score = 0;
 	    this.hand = hand;
@@ -80,6 +83,12 @@ public class Player {
 	public void render(Graphics g) {
 		// TODO Auto-generated method stub
 		
+	}
+
+	@Override
+	public Rectangle getBounds() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 	  }
 
